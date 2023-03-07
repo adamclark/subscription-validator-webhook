@@ -1,0 +1,14 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ template "app.fullname" . }}
+  annotations:
+    service.alpha.openshift.io/serving-cert-secret-name: {{ template "app.fullname" . }}-serving-cert
+spec:
+  ports:
+    - name: service
+      protocol: TCP
+      port: 443
+      targetPort: {{ .Values.https.port }}
+  selector:
+    app: {{ template "app.fullname" . }}
