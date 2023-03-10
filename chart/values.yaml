@@ -1,7 +1,8 @@
 replicaCount: 1
-  
+
 image:
-  repository: image-registry.openshift-image-registry.svc:5000/admission-webhooks/subscription-validator-webhook
+  repository: image-registry.openshift-image-registry.svc:5000
+  name: subscription-validator-webhook
   tag: 1.0.0-SNAPSHOT
   pullPolicy: Always
 

@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "{{ .Values.image.repository }}/{{ .Release.Namespace }}/{{ .Values.image.name }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
@@ -50,8 +50,13 @@ spec:
           volumeMounts:
           - mountPath: /certs
             name: serving-cert
+          - mountPath: /deployments/config
+            name: app-properties-config
       volumes:
       - name: serving-cert
         secret:
           defaultMode: 420
           secretName: {{ template "app.fullname" . }}-serving-cert
+      - name: app-properties-config
+        configMap:
+          name: {{ template "app.fullname" . }}-config
