@@ -1,5 +1,27 @@
 # subscription-validator-webhook
 
+This is an example of a [Validating Admission Plugin](https://docs.openshift.com/container-platform/4.12/architecture/admission-plug-ins) to validate subscriptions for certain operators against a list of channels that you want to allow subscriptions against.
+
+## How to Build and Deploy
+
+The webhook is written in Quarkus. There are a few ways to build and deploy Quarkus apps. The approach below uses Quarkus plugins to build the container image, followed by a Helm chart to deploy and configure the Validating Webhook. The Helm chart approach is used for deployment to more easily add a serving certificate (admission webhook must have TLS) and map in config for the webhook.
+
+### Build the Container Image
+
+To build the webhook as a JVM image:
+```shell script
+./mvnw clean package -Dquarkus.container-image.build=true [-Dquarkus.kubernetes-client.trust-certs=true]
+```
+
+### Deploy and Configure the Webhook
+To deploy the webhook image and configure the Validating Webhook:
+
+```shell script
+helm install <name> ./chart
+```
+
+## === Standard Quarkus generated README below ===
+
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
 If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
