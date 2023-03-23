@@ -13,16 +13,29 @@ import javax.ws.rs.core.MediaType;
 @QuarkusTest
 public class ValidatingAdmissionControllerTest {
     
-    InputStream allowedAMQReview = getClass().getClassLoader().getResourceAsStream("amq-allowed-review.json");
+    InputStream allowedAMQ710Review = getClass().getClassLoader().getResourceAsStream("amq-7.10-allowed-review.json");
+    InputStream allowedAMQ711Review = getClass().getClassLoader().getResourceAsStream("amq-7.11-allowed-review.json");
     InputStream disallowedAMQReview = getClass().getClassLoader().getResourceAsStream("amq-disallowed-review.json");
     InputStream allowedJDGReview = getClass().getClassLoader().getResourceAsStream("jdg-allowed-review.json");
     InputStream disallowedJDGReview = getClass().getClassLoader().getResourceAsStream("jdg-disallowed-review.json");
 
     @Test
-    public void allowedAMQ() {
+    public void allowedAMQ710() {
         given()
             .when()
-            .body(allowedAMQReview)
+            .body(allowedAMQ710Review)
+            .contentType(MediaType.APPLICATION_JSON)
+            .post("/validate")
+            .then()
+            .statusCode(200)
+            .body(containsString("\"allowed\":true"));
+    }
+    
+    @Test
+    public void allowedAMQ711() {
+        given()
+            .when()
+            .body(allowedAMQ711Review)
             .contentType(MediaType.APPLICATION_JSON)
             .post("/validate")
             .then()

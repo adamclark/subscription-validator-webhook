@@ -1,5 +1,6 @@
 package com.example.admission;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -58,13 +59,24 @@ public class ValidatingAdmissionController {
         
         log.info("Allowed channels: {}", allowedChannels);
 
+        List<String> cleanAllowedChannels = new ArrayList<>();
+
+        if(allowedChannels.isPresent()) {
+            //Trim any whitespace on properties
+            for (String allowedChannel : allowedChannels.get()) {
+                cleanAllowedChannels.add(allowedChannel.trim());
+            }
+        }
+
+        log.info("Clean allowed channels: {}", cleanAllowedChannels);
+
         // Default to allowing the subscription to be created
         boolean allowed = true;
         
-        log.info("Channel in allowed: {}", allowedChannels.get().contains(channel));
+        log.info("Channel in allowed: {}", cleanAllowedChannels.contains(channel));
 
         // Disallow if there is a list of allowed channels for this operator but the requested channel has not been configured as allowed.
-        if(allowedChannels.isPresent() && !allowedChannels.get().contains(channel)) {
+        if(!cleanAllowedChannels.contains(channel)) {
             log.info("Disallowing subscription");
             allowed = false;
         }
