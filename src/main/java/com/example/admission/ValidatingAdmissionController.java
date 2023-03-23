@@ -56,15 +56,21 @@ public class ValidatingAdmissionController {
         // Get the list of allowed channels for this operator (if present)
         Optional<List<String>> allowedChannels = ConfigProvider.getConfig().getOptionalValues(operatorName + ".allowed.channels", String.class);
         
+        log.info("Allowed channels: {}", allowedChannels);
+
         // Default to allowing the subscription to be created
         boolean allowed = true;
-            
+        
+        log.info("Channel in allowed: {}", allowedChannels.get().contains(channel));
+
         // Disallow if there is a list of allowed channels for this operator but the requested channel has not been configured as allowed.
         if(allowedChannels.isPresent() && !allowedChannels.get().contains(channel)) {
+            log.info("Disallowing subscription");
             allowed = false;
         }
     
         if(allowed) {
+            log.info("Returning allowed response");
             return new AdmissionReviewBuilder()
                 .withResponse(new AdmissionResponseBuilder()
                     .withAllowed(true)
@@ -72,6 +78,7 @@ public class ValidatingAdmissionController {
                     .build())
                 .build();
         } else {
+            log.info("Returning disallowed response");
             return new AdmissionReviewBuilder()
                 .withResponse(new AdmissionResponseBuilder()
                     .withAllowed(false)
