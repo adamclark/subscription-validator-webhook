@@ -18,7 +18,8 @@ public class ValidatingAdmissionControllerTest {
     InputStream disallowedAMQReview = getClass().getClassLoader().getResourceAsStream("amq-disallowed-review.json");
     InputStream allowedJDGReview = getClass().getClassLoader().getResourceAsStream("jdg-allowed-review.json");
     InputStream disallowedJDGReview = getClass().getClassLoader().getResourceAsStream("jdg-disallowed-review.json");
-
+    InputStream otherOperatorReview = getClass().getClassLoader().getResourceAsStream("other-operator-no-in-props-review.json");
+    
     @Test
     public void allowedAMQ710() {
         given()
@@ -76,5 +77,17 @@ public class ValidatingAdmissionControllerTest {
             .then()
             .statusCode(200)
             .body(containsString("\"allowed\":false"));
+    }
+
+    @Test
+    public void notInAllowedProps() {
+        given()
+            .when()
+            .body(otherOperatorReview)
+            .contentType(MediaType.APPLICATION_JSON)
+            .post("/validate")
+            .then()
+            .statusCode(200)
+            .body(containsString("\"allowed\":true"));
     }
 }
