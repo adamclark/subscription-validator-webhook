@@ -1,0 +1,72 @@
+pipeline:
+  name: Helm Chart PR Validation
+  inputs:
+    openshift_connector:
+      type: string
+      default: connector_OpenShift
+    helm_cli_image:
+      type: string
+      default: registry.access.redhat.com/helm-cli/helm-cli-rhel9:4.3
+  clone:
+    ref:
+      type: branch
+      name: main
+    enabled: true
+    connector: connector_Github
+    repo: adamclark/subscription-validator-webhook
+  stages:
+    - steps:
+        - run:
+            script: |-
+              echo "Starting Helm validation workflow..."
+
+              # 1. Move to the directory containing your chart (if not at root)
+              cd chart
+
+              # 2. Build or update dependencies first to prevent linting failures
+              echo "Building dependencies..."
+              helm dependency build .
+
+              # 3. Execute helm lint with strict validation
+              echo "Running strict chart linting..."
+              helm lint . --strict
+            container:
+              image: "${{ inputs.helm_cli_image }}"
+              connector: "${{ inputs.openshift_connector }}"
+          name: Helm Lint
+          id: Helm_Lint
+        - run:
+            script: |-
+              helm dependency build chart
+              helm package chart
+            container:
+              image: "${{ inputs.helm_cli_image }}"
+              connector: "${{ inputs.openshift_connector }}"
+          delegate: ocp-delegate
+        - run:
+            script: |-
+              find .
+            container:
+              image: "${{ inputs.helm_cli_image }}"
+              connector: "${{ inputs.openshift_connector }}"
+          delegate: ocp-delegate
+        - run:
+            script: curl -ik -u test:test123 -T subscription-validator-webhook-1.0.0.tgz
+              https://nexus-nexus.apps.ocp.sno.lab/repository/helm-releases/
+            container:
+              image: ${{ inputs.helm_cli_image }}
+              connector: ${{ inputs.openshift_connector }}
+          name: Nexus Upload
+          id: Nexus_Upload
+          delegate: ocp-delegate
+      runtime:
+        kubernetes:
+          namespace: harness-delegate
+          connector: "${{ inputs.openshift_connector }}"
+        delegate: ocp-delegate
+      platform:
+        os: linux
+        arch: amd64
+      name: Helm Chart PR Validation
+      id: Helm_Chart_PR_Validation
+  delegate: ocp-delegate
