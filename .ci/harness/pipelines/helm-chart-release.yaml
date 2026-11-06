@@ -1,5 +1,21 @@
 pipeline:
+  name: Helm Chart Release
+  inputs:
+    openshift_connector:
+      type: string
+      default: connector_OpenShift
+    helm_cli_image:
+      type: string
+      default: registry.access.redhat.com/helm-cli/helm-cli-rhel9:4.3
+  clone:
+    ref:
+      type: branch
+      name: harness-ci
+    enabled: true
+    connector: connector_Github
+    repo: adamclark/subscription-validator-webhook
   stages:
     - steps:
         - run:
             script: echo "hello world"
+  delegate: ocp-delegate
