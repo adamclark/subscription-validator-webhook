@@ -1,5 +1,82 @@
 pipeline:
+
+  name: Helm Chart Release
+  inputs:
+    openshift_connector:
+      type: string
+      default: connector_OpenShift
+    helm_cli_image:
+      type: string
+      default: registry.access.redhat.com/helm-cli/helm-cli-rhel9:4.3
+    ose_tools_cli_image:
+      type: string
+      default: image-registry.openshift-image-registry.svc:5000/harness-delegate/ci-runner:latest
+  clone:
+    ref:
+      type: branch
+      name: harness-ci
+    enabled: true
+    connector: connector_Github
+    repo: adamclark/subscription-validator-webhook
   stages:
     - steps:
         - run:
-            script: echo "hello world"
+            script: |-
+              git config --global --add safe.directory /harness
+              .ci/scripts/identify-changed-charts.sh main HEAD charts > changed-charts.txt
+              echo Changed Helm charts:
+              cat changed-charts.txt
+            container:
+              image: "${{ inputs.ose_tools_cli_image }}"
+              connector: "${{ inputs.openshift_connector }}"
+          name: Identify Changed Charts
+          id: Identify_Changed_Charts
+        - run:
+            script: |-
+              set -euo pipefail
+
+              while IFS= read -r chart; do
+                [ -n "$chart" ] || continue
+
+                CHART_DIR="charts/$chart"
+
+                # Re-run the chart validation.
+                .ci/scripts/validate-chart.sh "$CHART_DIR"
+
+                # Check that this exact chart version is not already released.
+                .ci/scripts/pre-release-check.sh "$CHART_DIR"
+              done < changed-charts.txt
+            container:
+              image: "${{ inputs.helm_cli_image }}"
+              connector: "${{ inputs.openshift_connector }}"
+          name: Validate Charts
+          id: Validate_Charts
+        - run:
+            script: |-
+              set -euo pipefail
+
+              while IFS= read -r chart; do
+                [ -n "$chart" ] || continue
+
+                CHART_DIR="charts/$chart"
+
+                # Package and release the chart.
+                .ci/scripts/release-chart.sh "$CHART_DIR"
+              done < changed-charts.txt
+            container:
+              image: "${{ inputs.helm_cli_image }}"
+              connector: "${{ inputs.openshift_connector }}"
+          name: Release Charts
+          id: Release_Charts
+      runtime:
+        kubernetes:
+          namespace: harness-delegate
+          connector: "${{ inputs.openshift_connector }}"
+        delegate: ocp-delegate
+      platform:
+        os: linux
+        arch: amd64
+      name: Helm Chart Release
+      id: Helm_Chart_Release
+
+  delegate: ocp-delegate
