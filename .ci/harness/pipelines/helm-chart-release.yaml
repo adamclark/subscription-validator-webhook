@@ -25,22 +25,21 @@ pipeline:
               git config --global --add safe.directory /harness
 
               echo "1"
-              git fetch --quiet origin "$BASE_REF" "$HEAD_REF" 2>/dev/null || {
+              git fetch --quiet origin main 2>/dev/null || {
                 echo "ERROR: Failed to fetch refs $BASE_REF and/or $HEAD_REF from origin" >&2
                 exit 1
               }
               git fetch origin "${BASE_REF}"
               git fetch origin main
               git branch -a
-              git tag
-              git show-ref
+
               # Verify the refs exist and are commits.
 
               echo "2"
-              git rev-parse --verify "${BASE_REF}^{commit}" >/dev/null
+              git rev-parse --verify "main^{commit}" >/dev/null
 
               echo "3"
-              git rev-parse --verify "${HEAD_REF}^{commit}" >/dev/null
+              git rev-parse --verify "HEAD^{commit}" >/dev/null
 
               echo "4"
 
