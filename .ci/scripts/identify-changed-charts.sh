@@ -3,7 +3,7 @@
 # Usage: identify-changed-charts.sh <base-ref> <head-ref> [chart-root]
 set -euo pipefail
 
-source "$(dirname "$0")/_helpers.sh"
+source "$(dirname $0)/_helpers.sh"
 
 BASE_REF="${1:?Usage: identify-changed-charts.sh <base-ref> <head-ref> [chart-root]}"
 HEAD_REF="${2:?Usage: identify-changed-charts.sh <base-ref> <head-ref> [chart-root]}"
