@@ -29,7 +29,9 @@ pipeline:
                 echo "ERROR: Failed to fetch refs $BASE_REF and/or $HEAD_REF from origin" >&2
                 exit 1
               }
-
+              git branch -a
+              git tag
+              git show-ref
               # Verify the refs exist and are commits.
 
               echo "2"
