@@ -18,11 +18,6 @@ pipeline:
   stages:
     - steps:
         - run:
-            script: find .
-            container:
-              image: "${{ inputs.helm_cli_image }}"
-              connector: "${{ inputs.openshift_connector }}"
-        - run:
             script: |-
               .ci/scripts/identify-changed-charts.sh main HEAD charts > changed-charts.txt
               echo Changer Helm charts:
@@ -30,6 +25,8 @@ pipeline:
             container:
               image: "${{ inputs.helm_cli_image }}"
               connector: "${{ inputs.openshift_connector }}"
+          name: Identify Changed Charts
+          id: Identify_Changed_Charts
         - run:
             script: |-
               set -euo pipefail
@@ -44,13 +41,29 @@ pipeline:
 
                 # Check that this exact chart version is not already released.
                 .ci/scripts/pre-release-check.sh "$CHART_DIR"
+              done < changed-charts.txt
+            container:
+              image: "${{ inputs.helm_cli_image }}"
+              connector: "${{ inputs.openshift_connector }}"
+          name: Validate Charts
+          id: Validate_Charts
+        - run:
+            script: |-
+              set -euo pipefail
 
-                # Package and release this chart .
+              while IFS= read -r chart; do
+                [ -n "$chart" ] || continue
+
+                CHART_DIR="charts/$chart"
+
+                # Package and release the chart.
                 .ci/scripts/release-chart.sh "$CHART_DIR"
               done < changed-charts.txt
             container:
               image: "${{ inputs.helm_cli_image }}"
               connector: "${{ inputs.openshift_connector }}"
+          name: Release Charts
+          id: Release_Charts
       runtime:
         kubernetes:
           namespace: harness-delegate
