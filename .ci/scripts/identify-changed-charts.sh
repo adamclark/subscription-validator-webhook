@@ -4,15 +4,15 @@
 set -euo pipefail
 
 source "$(dirname $0)/_helpers.sh"
-
+echo "1"
 BASE_REF="${1:?Usage: identify-changed-charts.sh <base-ref> <head-ref> [chart-root]}"
 HEAD_REF="${2:?Usage: identify-changed-charts.sh <base-ref> <head-ref> [chart-root]}"
 CHART_ROOT="${3:-chart}"
-
+echo "1"
 # Verify the refs exist and are commits.
 git rev-parse --verify "${BASE_REF}^{commit}" >/dev/null
 git rev-parse --verify "${HEAD_REF}^{commit}" >/dev/null
-
+echo "1"
 # Find changed charts and validate version bumps.
 git diff --name-only "$BASE_REF" "$HEAD_REF" \
   | grep "^${CHART_ROOT}/" \
