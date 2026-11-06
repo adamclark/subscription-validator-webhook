@@ -1,6 +1,6 @@
 
 apiVersion: v2
-name: subscription-validator-webhook
+name: subscription-validator-webhook-2
 description: A Helm chart for an admission controller to validate operator subscriptions
 
 # A chart can be either an 'application' or a 'library' chart.
