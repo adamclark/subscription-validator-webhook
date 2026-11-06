@@ -23,6 +23,24 @@ pipeline:
         - run:
             script: |-
               git config --global --add safe.directory /harness
+
+              echo "1"
+              git fetch --quiet origin "$BASE_REF" "$HEAD_REF" 2>/dev/null || {
+                echo "ERROR: Failed to fetch refs $BASE_REF and/or $HEAD_REF from origin" >&2
+                exit 1
+              }
+
+              # Verify the refs exist and are commits.
+
+              echo "2"
+              git rev-parse --verify "${BASE_REF}^{commit}" >/dev/null
+
+              echo "3"
+              git rev-parse --verify "${HEAD_REF}^{commit}" >/dev/null
+
+              echo "4"
+
+
               .ci/scripts/identify-changed-charts.sh main HEAD charts > changed-charts.txt
               echo Changed Helm charts:
               cat changed-charts.txt
