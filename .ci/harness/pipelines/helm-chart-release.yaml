@@ -29,6 +29,8 @@ pipeline:
                 echo "ERROR: Failed to fetch refs $BASE_REF and/or $HEAD_REF from origin" >&2
                 exit 1
               }
+              git fetch origin "${BASE_REF}"
+              git fetch origin main
               git branch -a
               git tag
               git show-ref
