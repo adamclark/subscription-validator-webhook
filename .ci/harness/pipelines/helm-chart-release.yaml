@@ -25,18 +25,17 @@ pipeline:
               git config --global --add safe.directory /harness
 
               echo "1"
-              git fetch --quiet origin main 2>/dev/null || {
-                echo "ERROR: Failed to fetch main from origin" >&2
-                exit 1
-              }
-              git fetch origin "${BASE_REF}"
-              git fetch origin main
+              # git fetch --quiet origin main 2>/dev/null || {
+              #   echo "ERROR: Failed to fetch main from origin" >&2
+              #   exit 1
+              # }
+
               git branch -a
 
               # Verify the refs exist and are commits.
 
               echo "2"
-              git rev-parse --verify "main^{commit}" >/dev/null
+              git rev-parse --verify "origin/main^{commit}" >/dev/null
 
               echo "3"
               git rev-parse --verify "harness-ci^{commit}" >/dev/null
@@ -44,7 +43,7 @@ pipeline:
               echo "4"
 
 
-              .ci/scripts/identify-changed-charts.sh main harness-ci charts > changed-charts.txt
+              .ci/scripts/identify-changed-charts.sh origin/main harness-ci charts > changed-charts.txt
               echo Changed Helm charts:
               cat changed-charts.txt
             container:
