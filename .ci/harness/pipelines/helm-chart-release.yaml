@@ -22,6 +22,7 @@ pipeline:
     - steps:
         - run:
             script: |-
+              git config --global --add safe.directory /harness
               .ci/scripts/identify-changed-charts.sh main HEAD charts > changed-charts.txt
               echo Changed Helm charts:
               cat changed-charts.txt
