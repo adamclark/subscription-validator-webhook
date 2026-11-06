@@ -32,7 +32,7 @@ pipeline:
               
               .ci/scripts/identify-changed-charts.sh origin/main harness-ci charts > changed-charts.txt
 
-              echo "Changed Helm charts:""
+              echo "Changed Helm charts:"
               cat changed-charts.txt
             container:
               image: "${{ inputs.ose_tools_cli_image }}"
