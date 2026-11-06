@@ -39,12 +39,12 @@ pipeline:
               git rev-parse --verify "main^{commit}" >/dev/null
 
               echo "3"
-              git rev-parse --verify "HEAD^{commit}" >/dev/null
+              git rev-parse --verify "harness-ci^{commit}" >/dev/null
 
               echo "4"
 
 
-              .ci/scripts/identify-changed-charts.sh main HEAD charts > changed-charts.txt
+              .ci/scripts/identify-changed-charts.sh main harness-ci charts > changed-charts.txt
               echo Changed Helm charts:
               cat changed-charts.txt
             container:
