@@ -23,7 +23,18 @@ pipeline:
         - run:
             script: |-
               git config --global --add safe.directory /harness
-              .ci/scripts/identify-changed-charts.sh main HEAD charts > changed-charts.txt
+
+              # Need to fetch main as harness doesn't dueing clone
+              git fetch --quiet origin main 2>/dev/null || {
+                echo "ERROR: Failed to fetch main from origin" >&2
+                exit 1
+              }
+
+              echo "6"
+              git show "origin/main:charts/subscription-validator-webhook/Chart.yaml"
+              echo "7"
+              
+              .ci/scripts/identify-changed-charts.sh origin/main harness-ci charts > changed-charts.txt
               echo Changed Helm charts:
               cat changed-charts.txt
             container:
