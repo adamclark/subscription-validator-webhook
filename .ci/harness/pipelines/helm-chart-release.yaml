@@ -25,10 +25,10 @@ pipeline:
               git config --global --add safe.directory /harness
 
               echo "1"
-              # git fetch --quiet origin main 2>/dev/null || {
-              #   echo "ERROR: Failed to fetch main from origin" >&2
-              #   exit 1
-              # }
+              git fetch --quiet origin main 2>/dev/null || {
+                echo "ERROR: Failed to fetch main from origin" >&2
+                exit 1
+              }
 
               git branch -a
 
