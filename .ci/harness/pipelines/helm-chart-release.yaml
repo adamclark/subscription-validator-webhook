@@ -1,4 +1,5 @@
 pipeline:
+
   name: Helm Chart Release
   inputs:
     openshift_connector:
@@ -18,4 +19,18 @@ pipeline:
     - steps:
         - run:
             script: echo "hello world"
+            container:
+              image: "${{ inputs.helm_cli_image }}"
+              connector: "${{ inputs.openshift_connector }}"
+      runtime:
+        kubernetes:
+          namespace: harness-delegate
+          connector: "${{ inputs.openshift_connector }}"
+        delegate: ocp-delegate
+      platform:
+        os: linux
+        arch: amd64
+      name: Helm Chart Release
+      id: Helm_Chart_Release
+
   delegate: ocp-delegate
