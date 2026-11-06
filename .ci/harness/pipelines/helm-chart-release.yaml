@@ -23,7 +23,7 @@ pipeline:
         - run:
             script: |-
               .ci/scripts/identify-changed-charts.sh main HEAD charts > changed-charts.txt
-              echo Changer Helm charts:
+              echo Changed Helm charts:
               cat changed-charts.txt
             container:
               image: "${{ inputs.ose_tools_cli_image }}"
