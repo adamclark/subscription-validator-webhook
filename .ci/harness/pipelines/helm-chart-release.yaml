@@ -10,7 +10,7 @@ pipeline:
       default: registry.access.redhat.com/helm-cli/helm-cli-rhel9:4.3
     ose_tools_cli_image:
       type: string
-      default: harness-delegate/ci-runner:latest
+      default: image-registry.openshift-image-registry.svc:5000/harness-delegate/ci-runner:latest
   clone:
     ref:
       type: branch
