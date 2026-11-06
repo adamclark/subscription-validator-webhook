@@ -22,6 +22,35 @@ pipeline:
             container:
               image: "${{ inputs.helm_cli_image }}"
               connector: "${{ inputs.openshift_connector }}"
+        - run:
+            script: |-
+              .ci/scripts/identify-changed-charts.sh main HEAD charts > changed-charts.txt
+              echo Changer Helm charts:
+              cat changed-charts.txt
+            container:
+              image: "${{ inputs.helm_cli_image }}"
+              connector: "${{ inputs.openshift_connector }}"
+        - run:
+            script: |-
+              set -euo pipefail
+
+              while IFS= read -r chart; do
+                [ -n "$chart" ] || continue
+
+                CHART_DIR="charts/$chart"
+
+                # Re-run the chart validation.
+                .ci/scripts/validate-chart.sh "$CHART_DIR"
+
+                # Check that this exact chart version is not already released.
+                .ci/scripts/pre-release-check.sh "$CHART_DIR"
+
+                # Package and release this chart .
+                .ci/scripts/release-chart.sh "$CHART_DIR"
+              done < changed-charts.txt
+            container:
+              image: "${{ inputs.helm_cli_image }}"
+              connector: "${{ inputs.openshift_connector }}"
       runtime:
         kubernetes:
           namespace: harness-delegate
