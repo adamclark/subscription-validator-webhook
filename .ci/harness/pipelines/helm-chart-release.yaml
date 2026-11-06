@@ -24,25 +24,19 @@ pipeline:
             script: |-
               git config --global --add safe.directory /harness
 
-              echo "1"
               git fetch --quiet origin main 2>/dev/null || {
                 echo "ERROR: Failed to fetch main from origin" >&2
                 exit 1
               }
 
-              git branch -a
-
-              # Verify the refs exist and are commits.
-
-              echo "2"
-              git rev-parse --verify "origin/main^{commit}" >/dev/null
-
-              echo "3"
-              git rev-parse --verify "harness-ci^{commit}" >/dev/null
-
               echo "4"
-
-
+              git diff --name-only origin/main harness-ci
+              echo "5"
+              git cat-file -e "harness-ci:charts/subscription-validator-webhook/Chart.yaml" 2>/dev/null
+              echo "6"
+              git show "origin/main:charts/subscription-validator-webhook/Chart.yaml" 2>/dev/null
+              echo "7"
+              
               .ci/scripts/identify-changed-charts.sh origin/main harness-ci charts > changed-charts.txt
               echo Changed Helm charts:
               cat changed-charts.txt
