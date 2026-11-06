@@ -8,6 +8,9 @@ pipeline:
     helm_cli_image:
       type: string
       default: registry.access.redhat.com/helm-cli/helm-cli-rhel9:4.3
+    ose_tools_cli_image:
+      type: string
+      default: registry.access.redhat.com/openshift4/ose-tools-rhel9:4.22
   clone:
     ref:
       type: branch
@@ -23,7 +26,7 @@ pipeline:
               echo Changer Helm charts:
               cat changed-charts.txt
             container:
-              image: "${{ inputs.helm_cli_image }}"
+              image: "${{ inputs.ose_tools_cli_image }}"
               connector: "${{ inputs.openshift_connector }}"
           name: Identify Changed Charts
           id: Identify_Changed_Charts
