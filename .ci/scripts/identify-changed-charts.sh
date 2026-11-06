@@ -9,6 +9,12 @@ BASE_REF="${1:?Usage: identify-changed-charts.sh <base-ref> <head-ref> [chart-ro
 HEAD_REF="${2:?Usage: identify-changed-charts.sh <base-ref> <head-ref> [chart-root]}"
 CHART_ROOT="${3:-chart}"
 
+# Fetch the base and head refs from origin to ensure they exist locally.
+git fetch --quiet origin "$BASE_REF" "$HEAD_REF" 2>/dev/null || {
+  echo "ERROR: Failed to fetch refs $BASE_REF and/or $HEAD_REF from origin" >&2
+  exit 1
+}
+
 # Verify the refs exist and are commits.
 git rev-parse --verify "${BASE_REF}^{commit}" >/dev/null
 git rev-parse --verify "${HEAD_REF}^{commit}" >/dev/null
