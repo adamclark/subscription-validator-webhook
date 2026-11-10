@@ -29,7 +29,7 @@ package="$tmpdir/${chart_name}-${chart_version}.tgz"
 }
 
 # Re-check no previous release immediately before upload to reduce race conditions.
-"$(dirname "$0")/chart-version-release-check.sh" "$CHART_DIR"
+"$(dirname "$0")/pre-release-check.sh" "$CHART_DIR"
 
 # Upload the chart to the Helm repository.
 upload_url="${HELM_REPO_URL%/}/"

@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # Fail if this chart/version is already present in the Helm repository.
-# Usage: chart-version-release-check.sh <chart-dir>
+# Usage: pre-release-check.sh <chart-dir>
 #
 # Required: HELM_REPO_URL, HELM_REPO_USER, HELM_REPO_PASSWORD
 set -euo pipefail
 
 source "$(dirname "$0")/_helpers.sh"
 
-CHART_DIR="${1:?Usage: chart-version-release-check.sh <chart-dir>}"
+CHART_DIR="${1:?Usage: pre-release-check.sh <chart-dir>}"
 : "${HELM_REPO_URL:?}"
 : "${HELM_REPO_USER:?}"
 : "${HELM_REPO_PASSWORD:?}"
