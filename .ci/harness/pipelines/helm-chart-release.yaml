@@ -5,10 +5,7 @@ pipeline:
     openshift_connector:
       type: string
       default: connector_OpenShift
-    helm_cli_image:
-      type: string
-      default: registry.access.redhat.com/helm-cli/helm-cli-rhel9:4.3
-    ose_tools_cli_image:
+    ci_runner_image:
       type: string
       default: image-registry.openshift-image-registry.svc:5000/harness-delegate/ci-runner:latest
   clone:
@@ -35,7 +32,7 @@ pipeline:
               echo "Changed Helm charts:"
               cat changed-charts.txt
             container:
-              image: ${{ inputs.ose_tools_cli_image }}
+              image: ${{ inputs.ci_runner_image }}
               connector: ${{ inputs.openshift_connector }}
           name: Identify Changed Charts
           id: Identify_Changed_Charts
@@ -55,7 +52,7 @@ pipeline:
                 .ci/scripts/pre-release-check.sh "$CHART_DIR"
               done < changed-charts.txt
             container:
-              image: ${{ inputs.helm_cli_image }}
+              image: ${{ inputs.ci_runner_image }}
               connector: ${{ inputs.openshift_connector }}
             env:
               HELM_REPO_URL: https://nexus-nexus.apps.ocp.sno.lab/repository/helm-releases
@@ -76,7 +73,7 @@ pipeline:
                 .ci/scripts/release-chart.sh "$CHART_DIR"
               done < changed-charts.txt
             container:
-              image: ${{ inputs.helm_cli_image }}
+              image: ${{ inputs.ci_runner_image }}
               connector: ${{ inputs.openshift_connector }}
             env:
               HELM_REPO_URL: https://nexus-nexus.apps.ocp.sno.lab/repository/helm-releases
