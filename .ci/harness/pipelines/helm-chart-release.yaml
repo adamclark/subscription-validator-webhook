@@ -40,8 +40,6 @@ pipeline:
             script: |-
               set -euo pipefail
 
-              echo $HELM_REPO_USER
-
               while IFS= read -r chart; do
                 [ -n "$chart" ] || continue
 
