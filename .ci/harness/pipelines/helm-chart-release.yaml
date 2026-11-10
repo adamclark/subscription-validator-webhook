@@ -88,5 +88,7 @@ pipeline:
       id: Helm_Chart_Release
       env:
         HELM_REPO_URL: https://nexus-nexus.apps.ocp.sno.lab/repository/helm-releases
+        HELM_REPO_USER: <+secrets.getValue("nexus_username_secret")>
+        HELM_REPO_PASSWORD: <+secrets.getValue("nexus_password_secret")>
 
   delegate: ocp-delegate
