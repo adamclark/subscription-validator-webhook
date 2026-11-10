@@ -29,14 +29,14 @@ pipeline:
                 echo "ERROR: Failed to fetch main from origin" >&2
                 exit 1
               }
-              
+
               .ci/scripts/identify-changed-charts.sh origin/main harness-ci charts > changed-charts.txt
 
               echo "Changed Helm charts:"
               cat changed-charts.txt
             container:
-              image: "${{ inputs.ose_tools_cli_image }}"
-              connector: "${{ inputs.openshift_connector }}"
+              image: ${{ inputs.ose_tools_cli_image }}
+              connector: ${{ inputs.openshift_connector }}
           name: Identify Changed Charts
           id: Identify_Changed_Charts
         - run:
@@ -55,8 +55,8 @@ pipeline:
                 .ci/scripts/pre-release-check.sh "$CHART_DIR"
               done < changed-charts.txt
             container:
-              image: "${{ inputs.helm_cli_image }}"
-              connector: "${{ inputs.openshift_connector }}"
+              image: ${{ inputs.helm_cli_image }}
+              connector: ${{ inputs.openshift_connector }}
           name: Validate Charts
           id: Validate_Charts
         - run:
@@ -72,19 +72,21 @@ pipeline:
                 .ci/scripts/release-chart.sh "$CHART_DIR"
               done < changed-charts.txt
             container:
-              image: "${{ inputs.helm_cli_image }}"
-              connector: "${{ inputs.openshift_connector }}"
+              image: ${{ inputs.helm_cli_image }}
+              connector: ${{ inputs.openshift_connector }}
           name: Release Charts
           id: Release_Charts
       runtime:
         kubernetes:
           namespace: harness-delegate
-          connector: "${{ inputs.openshift_connector }}"
+          connector: ${{ inputs.openshift_connector }}
         delegate: ocp-delegate
       platform:
         os: linux
         arch: amd64
       name: Helm Chart Release
       id: Helm_Chart_Release
+      env:
+        HELM_REPO_URL: https://nexus-nexus.apps.ocp.sno.lab/repository/helm-releases
 
   delegate: ocp-delegate
