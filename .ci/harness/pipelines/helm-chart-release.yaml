@@ -56,6 +56,7 @@ pipeline:
               connector: ${{ inputs.openshift_connector }}
             env:
               HELM_REPO_URL: https://nexus-nexus.apps.ocp.sno.lab/repository/helm-releases
+              HELM_INSECURE: true
               HELM_REPO_USER: <+secrets.getValue("nexus_username_secret")>
               HELM_REPO_PASSWORD: <+secrets.getValue("nexus_password_secret")>
           name: Validate Charts
@@ -77,6 +78,7 @@ pipeline:
               connector: ${{ inputs.openshift_connector }}
             env:
               HELM_REPO_URL: https://nexus-nexus.apps.ocp.sno.lab/repository/helm-releases
+              HELM_INSECURE: true
               HELM_REPO_USER: <+secrets.getValue("nexus_username_secret")>
               HELM_REPO_PASSWORD: <+secrets.getValue("nexus_password_secret")>
           name: Release Charts
