@@ -11,6 +11,12 @@ CHART_DIR="${1:?Usage: pre-release-check.sh <chart-dir>}"
 : "${HELM_REPO_URL:?}"
 : "${HELM_REPO_USER:?}"
 : "${HELM_REPO_PASSWORD:?}"
+# Set --insecure flag for curl if HELM_INSECURE is set to "true"
+
+INSECURE_FLAG=""
+if [[ "${HELM_INSECURE:-false}" == "true" ]]; then
+  INSECURE_FLAG="--insecure"
+fi
 
 chart_file="$CHART_DIR/Chart.yaml"
 [[ -f "$chart_file" ]] || { echo "ERROR: $chart_file not found" >&2; exit 2; }
@@ -22,7 +28,7 @@ url="${HELM_REPO_URL%/}/${chart_name}-${chart_version}.tgz"
 
 # HEAD request with timeouts to prevent hanging
 # --insecure only added for dev with dev Helm repo
-http_code="$(curl --insecure --silent --show-error --output /dev/null \
+http_code="$(curl $INSECURE_FLAG --silent --show-error --output /dev/null \
   --write-out '%{http_code}' \
   --connect-timeout 10 \
   --max-time 30 \

@@ -10,6 +10,12 @@ CHART_DIR="${1:?Usage: release-chart.sh <chart-dir>}"
 : "${HELM_REPO_USER:?}"
 : "${HELM_REPO_PASSWORD:?}"
 
+# Set --insecure flag for curl if HELM_INSECURE is set to "true"
+INSECURE_FLAG=""
+if [[ "${HELM_INSECURE:-false}" == "true" ]]; then
+  INSECURE_FLAG="--insecure"
+fi
+
 chart_file="$CHART_DIR/Chart.yaml"
 [[ -f "$chart_file" ]] || { echo "ERROR: $chart_file not found" >&2; exit 2; }
 
@@ -33,13 +39,13 @@ package="$tmpdir/${chart_name}-${chart_version}.tgz"
 
 # Upload the chart to the Helm repository.
 upload_url="${HELM_REPO_URL%/}/"
-curl --fail --silent --show-error \
+curl $INSECURE_FLAG --fail --silent --show-error \
   --user "${HELM_REPO_USER}:${HELM_REPO_PASSWORD}" \
   --upload-file "$package" \
   "$upload_url"
 
 # Verify the exact asset can be fetched after upload.
-http_code="$(curl --silent --show-error --output /dev/null \
+http_code="$(curl $INSECURE_FLAG --silent --show-error --output /dev/null \
   --write-out '%{http_code}' \
   --user "${HELM_REPO_USER}:${HELM_REPO_PASSWORD}" \
   --head "${upload_url}${chart_name}-${chart_version}.tgz")"
@@ -50,7 +56,7 @@ if [[ "$http_code" != "200" ]]; then
 fi
 
 # Verify the fingerprint of the uploaded file matches the local file.
-remote_sha256="$(curl --silent --show-error \
+remote_sha256="$(curl $INSECURE_FLAG --silent --show-error \
   --user "${HELM_REPO_USER}:${HELM_REPO_PASSWORD}" \
   "${upload_url}${chart_name}-${chart_version}.tgz" | sha256 | cut -d' ' -f1)"
 
