@@ -58,10 +58,10 @@ fi
 # Verify the fingerprint of the uploaded file matches the local file.
 remote_sha256="$(curl $INSECURE_FLAG --silent --show-error \
   --user "${HELM_REPO_USER}:${HELM_REPO_PASSWORD}" \
-  "${upload_url}${chart_name}-${chart_version}.tgz" | sha256 | cut -d' ' -f1)"
+  "${upload_url}${chart_name}-${chart_version}.tgz" | sha256sum | cut -d' ' -f1)"
 
 echo "Remote sha256: $remote_sha256"
 
-sha256 -c $remote_sha256 "$package"
+echo "$remote_sha256  $package" | sha256sum -c
 
 echo "Published and verified ${chart_name}-${chart_version}.tgz"

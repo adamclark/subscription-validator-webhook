@@ -37,6 +37,7 @@ spec:
           tar \
           gzip \
           ca-certificates \
+          coreutils \
           && dnf clean all
 
       # Install Helm
@@ -58,7 +59,8 @@ spec:
       # Verify installations
       RUN git --version \
           && helm version \
-          && yq --version
+          && yq --version \
+          && sha256sum --version
 
       # No final USER directive.
       # OpenShift can assign its arbitrary non-root UID.
