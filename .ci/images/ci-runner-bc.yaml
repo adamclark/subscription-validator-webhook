@@ -1,0 +1,67 @@
+kind: BuildConfig
+apiVersion: build.openshift.io/v1
+metadata:
+  name: ci-runner
+  namespace: harness-delegate
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: 'ci-runner:latest'
+  resources: {}
+  successfulBuildsHistoryLimit: 5
+  failedBuildsHistoryLimit: 5
+  strategy:
+    type: Docker
+    dockerStrategy:
+      from:
+        kind: DockerImage
+        name: 'registry.redhat.io/ubi10/ubi:latest'
+  postCommit: {}
+  source:
+    type: Dockerfile
+    dockerfile: |-
+
+      FROM registry.access.redhat.com/ubi10/ubi:latest
+
+      ARG HELM_VERSION=v4.3.1
+      ARG YQ_VERSION=v4.54.1
+      ARG TARGETARCH=amd64
+
+      USER 0
+
+      # Install system packages
+      RUN dnf install -y \
+          git \
+          curl \
+          tar \
+          gzip \
+          ca-certificates \
+          && dnf clean all
+
+      # Install Helm
+      RUN curl -fsSL \
+          "https://get.helm.sh/helm-${HELM_VERSION}-linux-${TARGETARCH}.tar.gz" \
+          -o /tmp/helm.tar.gz \
+          && tar -xzf /tmp/helm.tar.gz -C /tmp \
+          && install -m 0755 \
+            /tmp/linux-${TARGETARCH}/helm \
+            /usr/local/bin/helm \
+          && rm -rf /tmp/helm.tar.gz /tmp/linux-${TARGETARCH}
+
+      # Install yq (Mike Farah)
+      RUN curl -fsSL \
+          "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_${TARGETARCH}" \
+          -o /usr/local/bin/yq \
+          && chmod 0755 /usr/local/bin/yq
+
+      # Verify installations
+      RUN git --version \
+          && helm version \
+          && yq --version
+
+      # No final USER directive.
+      # OpenShift can assign its arbitrary non-root UID.
+
+      CMD ["/bin/bash"]
+  runPolicy: Serial
