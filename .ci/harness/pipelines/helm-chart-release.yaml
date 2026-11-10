@@ -57,6 +57,10 @@ pipeline:
             container:
               image: ${{ inputs.helm_cli_image }}
               connector: ${{ inputs.openshift_connector }}
+            env:
+              HELM_REPO_URL: https://nexus-nexus.apps.ocp.sno.lab/repository/helm-releases
+              HELM_REPO_USER: ${{ secrets.get("nexus_username_secret") }}
+              HELM_REPO_PASSWORD: ${{ secrets.get("nexus_password_secret") }}
           name: Validate Charts
           id: Validate_Charts
         - run:
@@ -74,6 +78,10 @@ pipeline:
             container:
               image: ${{ inputs.helm_cli_image }}
               connector: ${{ inputs.openshift_connector }}
+            env:
+              HELM_REPO_URL: https://nexus-nexus.apps.ocp.sno.lab/repository/helm-releases
+              HELM_REPO_USER: ${{ secrets.get("nexus_username_secret") }}
+              HELM_REPO_PASSWORD: ${{ secrets.get("nexus_password_secret") }}
           name: Release Charts
           id: Release_Charts
       runtime:
@@ -86,9 +94,4 @@ pipeline:
         arch: amd64
       name: Helm Chart Release
       id: Helm_Chart_Release
-      env:
-        HELM_REPO_URL: https://nexus-nexus.apps.ocp.sno.lab/repository/helm-releases
-        HELM_REPO_USER: ${{ secrets.get("nexus_username_secret") }}
-        HELM_REPO_PASSWORD: ${{ secrets.get("nexus_password_secret") }}
-
   delegate: ocp-delegate
