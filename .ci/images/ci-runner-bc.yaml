@@ -37,7 +37,6 @@ spec:
           tar \
           gzip \
           ca-certificates \
-          coreutils \
           && dnf clean all
 
       # Install Helm
