@@ -21,7 +21,8 @@ chart_version="$(get_chart_version_from_file "$chart_file")"
 url="${HELM_REPO_URL%/}/${chart_name}-${chart_version}.tgz"
 
 # HEAD request with timeouts to prevent hanging
-http_code="$(curl --silent --show-error --output /dev/null \
+# --insecure only added for dev with dev Helm repo
+http_code="$(curl --insecure --silent --show-error --output /dev/null \
   --write-out '%{http_code}' \
   --connect-timeout 10 \
   --max-time 30 \
